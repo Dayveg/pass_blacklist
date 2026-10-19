@@ -1,0 +1,278 @@
+{
+	"info": {
+		"_postman_id": "c1f72a80-14e3-4217-a0db-9f20e401d9f1",
+		"name": "Blacklist API - Entrega 1",
+		"description": "Colección completa de pruebas para el microservicio de lista negra (Entrega 1 - MISO / AWS Elastic Beanstalk)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:5000",
+			"type": "string"
+		},
+		{
+			"key": "bearerToken",
+			"value": "token-estatico-secreto-12345",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Health Check",
+			"item": [
+				{
+					"name": "Health Check (/health)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/health",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"health"
+							]
+						},
+						"description": "Verifica estado de salud del microservicio (utilizado por AWS ALB)."
+					},
+					"response": []
+				},
+				{
+					"name": "Health Check Root (/)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								""
+							]
+						},
+						"description": "Health check en la raíz del servicio."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Blacklists",
+			"item": [
+				{
+					"name": "1. Agregar a Lista Negra (Exitoso - 201)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{bearerToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"usuario.bloqueado@ejemplo.com\",\n  \"app_uuid\": \"7a3512b9-e1e3-4c91-9e2b-ef792ef1729b\",\n  \"blocked_reason\": \"Intento reiterado de fuerza bruta y transacciones sospechosas\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/blacklists",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"blacklists"
+							]
+						},
+						"description": "Registra un nuevo correo en la lista negra global."
+					},
+					"response": []
+				},
+				{
+					"name": "2. Agregar a Lista Negra (Email Duplicado - 409 Conflict)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{bearerToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"usuario.bloqueado@ejemplo.com\",\n  \"app_uuid\": \"7a3512b9-e1e3-4c91-9e2b-ef792ef1729b\",\n  \"blocked_reason\": \"Segundo intento de bloqueo para el mismo correo\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/blacklists",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"blacklists"
+							]
+						},
+						"description": "Intenta registrar un email que ya existe en la lista negra."
+					},
+					"response": []
+				},
+				{
+					"name": "3. Agregar a Lista Negra (Error de Validación - 400 Bad Request)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{bearerToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"formato-de-correo-invalido\",\n  \"app_uuid\": \"no-es-un-uuid\",\n  \"blocked_reason\": \"Validación de campos fallida\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/blacklists",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"blacklists"
+							]
+						},
+						"description": "Envío de datos inválidos para validar el esquema Marshmallow."
+					},
+					"response": []
+				},
+				{
+					"name": "4. Agregar a Lista Negra (Sin Token - 401 Unauthorized)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"sin.token@ejemplo.com\",\n  \"app_uuid\": \"7a3512b9-e1e3-4c91-9e2b-ef792ef1729b\",\n  \"blocked_reason\": \"Petición sin cabecera de autenticación\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/blacklists",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"blacklists"
+							]
+						},
+						"description": "Verifica que el endpoint rechaza peticiones sin encabezado Authorization."
+					},
+					"response": []
+				},
+				{
+					"name": "5. Agregar a Lista Negra (Token Inválido - 403 Forbidden)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer token-invalido-xyz",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"token.invalido@ejemplo.com\",\n  \"app_uuid\": \"7a3512b9-e1e3-4c91-9e2b-ef792ef1729b\",\n  \"blocked_reason\": \"Petición con token erróneo\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/blacklists",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"blacklists"
+							]
+						},
+						"description": "Verifica que el microservicio valida estrictamente el token estático configurado."
+					},
+					"response": []
+				},
+				{
+					"name": "6. Consultar Email Bloqueado (200 OK - is_blacklisted: true)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{bearerToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/blacklists/usuario.bloqueado@ejemplo.com",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"blacklists",
+								"usuario.bloqueado@ejemplo.com"
+							]
+						},
+						"description": "Consulta un email que sí está en la lista negra."
+					},
+					"response": []
+				},
+				{
+					"name": "7. Consultar Email No Bloqueado (200 OK - is_blacklisted: false)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{bearerToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/blacklists/usuario.limpio@ejemplo.com",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"blacklists",
+								"usuario.limpio@ejemplo.com"
+							]
+						},
+						"description": "Consulta un email que NO está en la lista negra."
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
