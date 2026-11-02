@@ -54,3 +54,9 @@ htmlcov/
 # OS generated files
 .DS_Store
 Thumbs.db
+
+# Documents and office files
+*.docx
+~$*.docx
+generate_docs.py
+make_zip.py

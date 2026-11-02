@@ -15,9 +15,13 @@ def create_app(config_class=Config):
     jwt = JWTManager(app)
     api = Api(app)
 
-    # Crear tablas en la base de datos automáticamente al iniciar
+    # Crear tablas en la base de datos automáticamente al iniciar si la conexión está lista
     with app.app_context():
-        db.create_all()
+        try:
+            db.create_all()
+            print("Base de datos inicializada correctamente.")
+        except Exception as e:
+            print(f"Aviso de conexion a base de datos diferida: {e}")
 
     # Registro de rutas según especificación exacta
     api.add_resource(BlacklistListResource, '/blacklists')

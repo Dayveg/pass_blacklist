@@ -4,14 +4,11 @@
 
 ---
 
-**Integrantes del Equipo:**
-- *[Nombre Integrante 1] - [Correo institucional]*
-- *[Nombre Integrante 2] - [Correo institucional]*
-- *[Nombre Integrante 3] - [Correo institucional]*
-- *[Nombre Integrante 4] - [Correo institucional]*
+**Estudiante:**
+- Leidy Dayana Vega Medina - `ld.vega@uniandes.edu.co`
 
 **Fecha:** *Octubre 2026*  
-**Enlace Repositorio GitHub:** *`https://github.com/[Organizacion-o-Usuario]/pass_blacklist`*  
+**Enlace Repositorio GitHub:** *`https://github.com/Dayveg/pass_blacklist`*  
 **Enlace Documentación Pública Postman:** *`https://documenter.getpostman.com/view/[ID-Coleccion]`*  
 **Enlace Video de Sustentación (Máx. 10 min):** *`https://youtu.be/[ID-Video]`*  
 **URL de la Aplicación en AWS Elastic Beanstalk:** *`http://[nombre-entorno].eba-xxx.us-east-1.elasticbeanstalk.com`*
@@ -249,6 +246,6 @@ Se implementó y documentó la totalidad de los escenarios funcionales exigidos 
 ## 4. Enlaces de Entrega y Verificación
 
 - **URL Pública del Microservicio en AWS:** `http://[su-entorno].elasticbeanstalk.com`
-- **Repositorio de GitHub:** `https://github.com/[Organizacion-o-Usuario]/pass_blacklist`
+- **Repositorio de GitHub:** `https://github.com/Dayveg/pass_blacklist`
 - **Documentación Pública de Postman:** `https://documenter.getpostman.com/view/[ID-Coleccion]`
 - **Video de Sustentación (Duración máxima 10 minutos):** `https://youtu.be/[ID-Video]`
