@@ -30,7 +30,7 @@ def auth_headers():
 def test_health_check(client):
     """Verifica que los endpoints de Health Check respondan 200 sin autenticación."""
     res_health = client.get('/health')
-    assert res_health.status_code == 200
+    assert res_health.status_code == 500  # Fallo intencional para verificar compuerta de calidad CI
     assert res_health.get_json() == {'status': 'healthy', 'service': 'blacklist-microservice'}
 
     res_root = client.get('/')
