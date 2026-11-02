@@ -1,32 +1,18 @@
 version: 0.2
 
-env:
-  variables:
-    PYTHONPATH: "."
-
 phases:
   install:
     runtime-versions:
       python: 3.11
     commands:
-      - echo "==> Instalando dependencias del microservicio y suite de pruebas..."
-      - python -m pip install --upgrade pip
-      - pip install -r requirements.txt
-      - pip install pytest pytest-cov
-
+      - pip install --upgrade pip
+      - pip install -r requirements.txt pytest
   pre_build:
     commands:
-      - echo "==> Ejecutando suite de pruebas unitarias automatizadas con pytest..."
-      - pytest tests/ -v --junitxml=test-results.xml
-
+      - pytest tests/ -v
   build:
     commands:
-      - echo "==> Pruebas superadas con exito. Preparando artefacto de despliegue..."
-      - echo "==> Fecha y commit: $(date)"
-
-  post_build:
-    commands:
-      - echo "==> Proceso de Integracion Continua (CI) completado exitosamente."
+      - echo "Compilacion y pruebas unitarias finalizadas exitosamente"
 
 artifacts:
   files:
@@ -39,10 +25,3 @@ artifacts:
     - views/**/*
     - .ebextensions/**/*
   name: blacklist-microservice-artifact.zip
-
-reports:
-  pytest_reports:
-    files:
-      - test-results.xml
-    base-directory: .
-    file-format: JUNITXML
