@@ -60,3 +60,6 @@ Thumbs.db
 ~$*.docx
 generate_docs.py
 make_zip.py
+
+# PDF documents (submitted only to University LMS platform)
+*.pdf
