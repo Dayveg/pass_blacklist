@@ -1,5 +1,11 @@
 version: 0.2
 
+env:
+  variables:
+    AWS_DEFAULT_REGION: "us-east-1"
+    IMAGE_REPO_NAME: "blacklist-microservice"
+    CONTAINER_NAME: "blacklist-container"
+
 phases:
   install:
     runtime-versions:
@@ -9,19 +15,32 @@ phases:
       - pip install -r requirements.txt pytest
   pre_build:
     commands:
+      - echo "1. Ejecutando pruebas unitarias (Compuerta de Calidad CI)..."
       - pytest tests/ -v
+      - echo "2. Autenticando en Amazon ECR..."
+      - AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+      - REPOSITORY_URI=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - IMAGE_TAG=${COMMIT_HASH:-latest}
   build:
     commands:
-      - echo "Compilacion y pruebas unitarias finalizadas exitosamente"
+      - echo "3. Construyendo imagen Docker del microservicio..."
+      - docker build -t $REPOSITORY_URI:latest .
+      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
+  post_build:
+    commands:
+      - echo "4. Publicando imagen Docker en Amazon ECR..."
+      - docker push $REPOSITORY_URI:latest
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - echo "5. Generando artefactos de despliegue continuo (ECS / CodeDeploy)..."
+      - printf '[{"name":"%s","imageUri":"%s"}]' "$CONTAINER_NAME" "$REPOSITORY_URI:$IMAGE_TAG" > imagedefinitions.json
+      - printf '{"ImageURI":"%s"}' "$REPOSITORY_URI:$IMAGE_TAG" > imageDetail.json
+      - sed -i "s|<AWS_ACCOUNT_ID>|$AWS_ACCOUNT_ID|g" taskdef.json
 
 artifacts:
   files:
-    - application.py
-    - config.py
-    - requirements.txt
-    - Procfile
-    - buildspec.yml
-    - models/**/*
-    - views/**/*
-    - .ebextensions/**/*
-  name: blacklist-microservice-artifact.zip
+    - imagedefinitions.json
+    - imageDetail.json
+    - appspec.yaml
+    - taskdef.json

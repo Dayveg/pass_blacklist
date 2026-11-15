@@ -63,3 +63,11 @@ make_zip.py
 
 # PDF documents (submitted only to University LMS platform)
 *.pdf
+
+# Terraform state and provider binaries
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+*.tfvars
+*.tfplan
