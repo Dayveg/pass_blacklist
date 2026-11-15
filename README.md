@@ -163,7 +163,11 @@ zip -r deploy_package_v1.zip . -x "*.git*" -x "*venv*" -x "*__pycache__*" -x "*.
 
 #### En Windows PowerShell:
 ```powershell
-Compress-Archive -Path application.py, config.py, requirements.txt, models, views, .ebextensions -DestinationPath deploy_package_v1.zip -Force
+.\package.ps1
+```
+*(O ejecutar el comando con Python para asegurar rutas POSIX con separador `/` compatible con Linux AWS EB)*:
+```powershell
+python -c "import zipfile, os; items = ['application.py', 'config.py', 'requirements.txt', 'Procfile', 'buildspec.yml', 'models', 'views', '.ebextensions']; z = zipfile.ZipFile('deploy_package_v1.zip', 'w', zipfile.ZIP_DEFLATED); [z.write(item, item) if os.path.isfile(item) else [z.write(os.path.join(root, f), os.path.relpath(os.path.join(root, f), '.').replace(os.sep, '/')) for root, _, files in os.walk(item) for f in files if '__pycache__' not in root and not f.endswith('.pyc')] for item in items]; z.close()"
 ```
 
 ---
