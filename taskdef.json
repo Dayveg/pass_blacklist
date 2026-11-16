@@ -6,7 +6,7 @@
   ],
   "cpu": "256",
   "memory": "512",
-  "executionRoleArn": "arn:aws:iam::533267010551:role/blacklist-ecsTaskExecutionRole",
+  "executionRoleArn": "arn:aws:iam::<AWS_ACCOUNT_ID>:role/blacklist-ecsTaskExecutionRole",
   "containerDefinitions": [
     {
       "name": "blacklist-container",

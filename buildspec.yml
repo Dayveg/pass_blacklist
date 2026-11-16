@@ -8,14 +8,16 @@ env:
 
 phases:
   install:
+    on-failure: ABORT
     runtime-versions:
       python: 3.11
     commands:
       - pip install --upgrade pip
       - pip install -r requirements.txt pytest
   pre_build:
+    on-failure: ABORT
     commands:
-      - echo "1. Ejecutando pruebas unitarias (Compuerta de Calidad CI)..."
+      - echo "1. Ejecutando pruebas unitarias..."
       - pytest tests/ -v
       - echo "2. Autenticando en Amazon ECR..."
       - AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
@@ -24,12 +26,15 @@ phases:
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - IMAGE_TAG=${COMMIT_HASH:-latest}
   build:
+    on-failure: ABORT
     commands:
       - echo "3. Construyendo imagen Docker del microservicio..."
       - docker build -t $REPOSITORY_URI:latest .
       - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
   post_build:
+    on-failure: ABORT
     commands:
+      - if [ "$CODEBUILD_BUILD_SUCCEEDING" = "0" ]; then echo "Fallo en pruebas o build. Se aborta la publicacion en ECR y S3."; exit 1; fi
       - echo "4. Publicando imagen Docker en Amazon ECR..."
       - docker push $REPOSITORY_URI:latest
       - docker push $REPOSITORY_URI:$IMAGE_TAG
